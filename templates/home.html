@@ -1,0 +1,22 @@
+<!-- templates/home.html -->
+{% extends "base.html" %}
+{% block content %}
+<div class="home-container">
+    <h2>Welcome, {{ current_user.name }}!</h2>
+    <p>Find a meaningful connection based on personality first.</p>
+    <a href="{{ url_for('start_matching') }}" class="cta-button">Find a New Match</a>
+    <h3>Your Past Conversations</h3>
+    <div class="match-history">
+        {% if matches %}
+            {% for match in matches %}
+                <a href="{{ url_for('chat', match_id=match.id) }}" class="match-card">
+                    <img src="{{ url_for('static', filename='default.png') }}" alt="Profile Picture">
+                    <p>{{ match.name }}</p>
+                </a>
+            {% endfor %}
+        {% else %}
+            <p>You have no past matches yet. Find one now!</p>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

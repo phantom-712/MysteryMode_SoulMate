@@ -1,0 +1,22 @@
+<!-- templates/waiting.html -->
+{% extends "base.html" %}
+{% block head %}
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script type="text/javascript" charset="utf-8">
+    document.addEventListener('DOMContentLoaded', function() {
+        var socket = io();
+        socket.on('connect', function() {
+            socket.emit('join', {}); // Joins the user's private room
+        });
+        socket.on('match_found', function(data) {
+            window.location.href = `/chat/${data.partner_id}`;
+        });
+    });
+</script>
+{% endblock %}
+{% block content %}
+<div class="waiting-container">
+    <h1>Searching for a match...</h1>
+    <p>Please wait a moment while we find a connection for you. ⏳</p>
+</div>
+{% endblock %}

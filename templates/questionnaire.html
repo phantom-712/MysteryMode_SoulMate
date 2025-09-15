@@ -1,0 +1,16 @@
+<!-- templates/questionnaire.html -->
+{% extends "base.html" %}
+{% block head %}
+    <script src="{{ url_for('static', filename='questionnaire.js') }}" defer></script>
+{% endblock %}
+{% block content %}
+    <canvas id="background-canvas"></canvas>
+    <div class="questionnaire-container" data-total-questions="{{ total_questions }}">
+        <h2 id="question-text">Loading question...</h2>
+        <div id="options-container"></div>
+        <div class="navigation">
+            <button id="prev-question" class="arrow-btn">&larr;</button>
+            <button id="next-question" class="arrow-btn">&rarr;</button>
+        </div>
+    </div>
+{% endblock %}

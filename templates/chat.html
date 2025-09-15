@@ -1,0 +1,64 @@
+<!-- templates/chat.html -->
+{% extends "base.html" %}
+{% block head %}
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<!-- NEW: Emoji Picker Library -->
+<script type="module" src="https://cdn.jsdelivr.net/npm/emoji-picker-element@^1/index.js"></script>
+<script src="{{ url_for('static', filename='chat.js') }}" defer></script>
+{% endblock %}
+{% block content %}
+<audio id="message-sent-sound" src="{{ url_for('static', filename='bubble_pop.mp3') }}" preload="auto"></audio>
+<audio id="message-received-sound" src="{{ url_for('static', filename='bubble_pop.mp3') }}" preload="auto"></audio>
+
+<div id="audio-overlay">
+    <button id="start-chat-btn">Click to Start Chat</button>
+</div>
+
+<div class="chat-container hidden" data-room-id="{{ room_id }}" data-receiver-id="{{ match.id }}" data-sender-id="{{ current_user.id }}">
+    <div class="chat-header">
+        <div class="profile-info {% if not is_revealed %}blurred{% endif %}">
+            <img src="{{ url_for('static', filename='default.png') }}" alt="Match's Photo" id="match-photo">
+            <h2><span id="match-name">{{ match.name }}</span></h2>
+        </div>
+        {% if not is_revealed %}
+            <button id="reveal-btn" {% if req_by_me %}disabled{% endif %}>
+                {% if req_by_me %}Request Sent{% else %}Ready to Reveal?{% endif %}
+            </button>
+        {% endif %}
+        <p id="reveal-status"></p>
+    </div>
+    <div id="chat-box">
+        <!-- Messages will be dynamically loaded here, including images and audio -->
+        {% for message in messages %}
+            <div class="message {% if message.sender_id == current_user.id %}sent{% else %}received{% endif %}">
+                {% if message.message_type == 'text' %}
+                    <p>{{ message.content }}</p>
+                {% elif message.message_type == 'image' %}
+                    <img src="{{ message.content }}" class="chat-image" alt="User image">
+                {% elif message.message_type == 'audio' %}
+                    <audio controls src="{{ message.content }}"></audio>
+                {% endif %}
+                <span class="status-tick">✓</span>
+            </div>
+        {% endfor %}
+    </div>
+    <p id="typing-indicator" class="hidden"></p>
+    
+    <!-- NEW: Emoji picker container -->
+    <div id="emoji-picker-container" class="hidden">
+        <emoji-picker></emoji-picker>
+    </div>
+
+    <form id="message-form" class="message-form-new">
+        <button type="button" id="emoji-btn" class="icon-btn" title="Emoji">😊</button>
+        <!-- NEW: Hidden file input for images -->
+        <input type="file" id="image-input" accept="image/*" class="hidden">
+        <button type="button" id="image-btn" class="icon-btn" title="Send Photo">🖼️</button>
+        
+        <input type="text" id="message-input" placeholder="Type a message..." autocomplete="off" required>
+        
+        <button type="button" id="voice-btn" class="icon-btn" title="Voice Message">🎙️</button>
+        <button type="submit" class="send-btn">➤</button>
+    </form>
+</div>
+{% endblock %}
