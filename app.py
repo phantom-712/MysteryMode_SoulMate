@@ -11,9 +11,24 @@ import json
 
 # --- App Configuration ---
 app = Flask(__name__)
-app.config['SECRET_KEY'] = 'a_very_secret_key_for_production'
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+
+# Production-ready configuration
+app.config['SECRET_KEY'] = os.environ.get('SECRET_KEY', 'a_very_secret_key_for_production')
+
+# Database configuration for Railway (PostgreSQL) or local development (SQLite)
+database_url = os.environ.get('DATABASE_URL')
+if database_url:
+    # Railway PostgreSQL
+    if database_url.startswith('postgres://'):
+        database_url = database_url.replace('postgres://', 'postgresql://', 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = database_url
+else:
+    # Local development
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+app.config['MAX_CONTENT_LENGTH'] = 16 * 1024 * 1024  # 16MB max file size
+
 UPLOAD_FOLDER = os.path.join(app.static_folder, 'uploads')
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 
@@ -278,4 +293,9 @@ def on_audio(data):
 if __name__ == '__main__':
     with app.app_context():
         db.create_all()
-    socketio.run(app, debug=True)
+    
+    # Production configuration for Railway
+    port = int(os.environ.get('PORT', 5000))
+    debug = os.environ.get('FLASK_ENV') != 'production'
+    
+    socketio.run(app, host='0.0.0.0', port=port, debug=debug)
