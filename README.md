@@ -358,7 +358,7 @@ We welcome contributions from developers who share our vision of authentic conne
 ## 📞 Support & Contact
 
 For technical support, feature requests, or partnership inquiries:
-- **Email**: team@soulmate-app.com
+- **Email**: ansumanpatra10@gmail.com
 - **GitHub Issues**: Report bugs and request features
 - **Documentation**: Comprehensive guides and API documentation
 
